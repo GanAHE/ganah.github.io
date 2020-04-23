@@ -1,13 +1,11 @@
-﻿<!--time:2020/03/29
-work:webgis/html/-->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html dir="ltr">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
     <!--页面标题-->
     <title>
-        地图——GanAHE的小创元世纪
+        WebGISWhu_GanAHE
     </title>
     <!--页面样式-->
     <style>
@@ -107,12 +105,16 @@ work:webgis/html/-->
         }
     </style>
     <!--ARCGIS JS api-->
-    <link rel="stylesheet" href="https://js.arcgis.com/3.31/esri/css/esri.css">
-    <script src="https://js.arcgis.com/3.31/"></script>
+    <!--<link rel="stylesheet" href="https://js.arcgis.com/3.31/esri/css/esri.css">-->
+    <!--<script src="https://js.arcgis.com/3.31/"></script>-->
 
-    <script src="https://js.arcgis.com/3.32/"></script>
     <link rel="stylesheet" href="https://js.arcgis.com/3.32/esri/themes/calcite/dijit/calcite.css">
     <link rel="stylesheet" href="https://js.arcgis.com/3.32/esri/themes/calcite/esri/esri.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.32/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.32/esri/css/esri.css">
+
+
+    
     <!--用的是arcgis 3.31 的版本，里面有api reference-->
 </head>
 <!--html 页面区域-->
@@ -124,7 +126,7 @@ work:webgis/html/-->
     <!--添加POI点按钮元素-->
     <input id="m_addPOI" type="button" value="点位" />
     <!--外链-->
-    <input id="blogURL" type="button" value="主页" onclick="window.open('https://www.ganahe.top')" />
+    <input id="blogURL" type="button" value="合作" onclick="window.open('https://www.ganahe.top')" />
     <!--打印功能-->
     <input id="printMap" type="button" value="打印" />
     <!--搜索功能控件元素-->
@@ -133,15 +135,41 @@ work:webgis/html/-->
     <div id="HomeButton"></div>
     <!--H5定位按钮-->
     <div id="LocateButton"></div>
-
-    <div id="mainWindow" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false"
-         style="width:100%; height:100%;">
-    <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"> 
-    <div id="titlePane" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Measurement', closable:false">
-        <div id="measurementDiv"></div>
+    <!--测量-->
+    
+    <div id="map" 
+         data-dojo-type="dijit/layout/ContentPane" 
+         data-dojo-props="region:'center'">
+        <div id="titlePane" 
+             data-dojo-type="dijit/TitlePane" 
+             data-dojo-props="title:'Measurement', closable:false">
+            <div id="measurementDiv"></div>
             <span style="font-size:smaller;padding:5px 5px;">Press <b>CTRL</b> to enable snapping.</span>
         </div>
+    </div> 
+
+
+
+    <!--比例尺-->
+    <div id="map"
+            data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region:'center'"
+            style="overflow:hidden;">
+    </div>
+
+    <!--导航-->
+    
+    <div id="dir"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region:'center'"
+         style="overflow:hidden;">
+        >
+    </div>
+      
+    
 </body>
+
+<script src="https://js.arcgis.com/3.32/"></script>
 <script>
 
     // arcgis js 基础地图代码区域
@@ -161,6 +189,7 @@ work:webgis/html/-->
         "esri/dijit/HomeButton",
         "esri/dijit/LocateButton",
         "esri/dijit/OverviewMap",
+
 
         "dojo/dom",
         "esri/Color",
@@ -182,10 +211,19 @@ work:webgis/html/-->
         "dijit/layout/ContentPane",
         "dijit/TitlePane",
         "dijit/form/CheckBox",
+        
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+
+        "esri/dijit/Directions",
+        "dojo/parser",
+        "dijit/layout/BorderContainer", "dijit/layout/ContentPane",
+
         "dojo/domReady!"
     ], function (Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, Point, Graphic, InfoTemplate, PictureMarkerSymbol, SpatialReference, BasemapToggle, Search, HomeButton, LocateButton, OverviewMap, dom, Color, keys, parser,
-        esriConfig, has,SnappingManager, Measurement, FeatureLayer, SimpleRenderer, GeometryService, SimpleLineSymbol, SimpleFillSymbol) {
+        esriConfig, has, SnappingManager, Measurement, FeatureLayer, SimpleRenderer, GeometryService, SimpleLineSymbol, SimpleFillSymbol, Scalebar, Directions) {
 
+        //parser.parse();
 
         //创建地图控件
         map = new Map("MapView",//HTML div 页面元素
@@ -216,7 +254,7 @@ work:webgis/html/-->
 
         // ajax地图交互代码区域
         //点图符
-        var symbol = new PictureMarkerSymbol("RedPin1LargeB.png", 32, 32).setOffset(0, 15);
+        var symbol = new PictureMarkerSymbol("/DIYWeb/map/location.png", 32, 32).setOffset(0, 15);
 
         //按钮响应函数
         function onAddPOI() {
@@ -285,8 +323,16 @@ work:webgis/html/-->
         });
         overviewMapDijit.startup();
 
-      
+        // 比例尺
+        var scalebar = new Scalebar({
+            map: map,
+            // "dual" displays both miles and kilometers
+            // "english" is the default, which displays miles
+            // use "metric" for kilometers
+            scalebarUnit: "dual"
+        });
 
+        //测量
         //This service is for development and testing purposes only. We recommend that you create your own geometry service for use within your applications
         esriConfig.defaults.geometryService = new GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
 
@@ -317,6 +363,23 @@ work:webgis/html/-->
         }, dom.byId("measurementDiv"));
         measurement.startup();
 
+        //导航
+        // default will point to ArcGIS world routing service
+        // here we use a service proxy to access that service without providing credentials
+        var directions = new Directions({
+            map: map,
+            //routeTaskUrl: "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route" // 仅能在美国区域实现
+            routeTaskUrl: "https://utility.arcgis.com/usrsvcs/appservices/srsKxBIxJZB0pTZ0/rest/services/World/Route/NAServer/Route_World"
+            // --------------------------------------------------------------------
+            // New constuctor option and property showSaveButton added at version
+            // 3.17 to allow saving route. For more information see the API Reference.
+            // https://developers.arcgis.com/javascript/3/jsapi/directions-amd.html#showsavebutton
+            //
+            // Uncomment the line below to add the save button to the Directions widget
+            // --------------------------------------------------------------------
+             //, showSaveButton: true
+        }, "dir");
+        directions.startup();
 
 
         //添加按钮事件
