@@ -7,7 +7,6 @@ Allow: /resources/
 Allow:/about/
 Allow:/siteEvents/
 
-Disallow: 
 Disallow: /vendors/
 Disallow: /js/
 Disallow: /css/
