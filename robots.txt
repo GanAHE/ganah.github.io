@@ -1,9 +1,7 @@
 User-agent: *
 Disallow: 
-Disallow: /lib/
 Disallow: /js/
 Disallow: /css/
-Disallow: /images/
 
 Sitemap: https://www.ganahe.top/sitemap.xml
 Sitemap: https://www.ganahe.top/baidusitemap.xml
