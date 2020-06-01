@@ -1,21 +1,9 @@
 User-agent: *
-Allow: /
-Allow: /archives/
-Allow: /categories/
-Allow: /tags/ 
-Allow: /DIYWeb/ 
-Allow: /about/
-Allow: /siteEvents/
-Allow: /page/
-Allow: /PDFRead/
-
+Disallow: 
 Disallow: /lib/
 Disallow: /js/
 Disallow: /css/
-Disallow: /live2d/
-Disallow: /live2dw/
-Disallow: /fonts/
-Disallow: /fancybox/
+Disallow: /images/
 
 Sitemap: https://www.ganahe.top/sitemap.xml
 Sitemap: https://www.ganahe.top/baidusitemap.xml
