@@ -6,8 +6,6 @@ Allow: /tags/
 Allow: /resources/ 
 Allow:/about/
 Allow:/siteEvents/
-Allow:/page/
-Allow:/DIYWeb/map/
 
 Disallow: /vendors/
 Disallow: /js/
